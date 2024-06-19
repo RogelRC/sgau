@@ -1,35 +1,37 @@
-// utils/authUtils.js
 import jwt from "jsonwebtoken";
 import { pool } from "../database/connection.js";
 
-const secretKey = process.env.JWT_SECRET;
-
-// Generar token
 export const generateToken = (user) => {
-    return jwt.sign({ username: user.username, role: user.role }, secretKey, { expiresIn: "15m" });
+    return jwt.sign({ id: user.id, username: user.username, role: user.role }, process.env.JWT_SECRET, { expiresIn: "1h" });
 };
 
-// Guardar token
-export const storeToken = async (token, username) => {
-    const query = 'INSERT INTO "tokens" (token, username) VALUES ($1, $2)';
-    await pool.query(query, [token, username]);
+export const storeToken = async (token, userId) => {
+    try {
+        const storeTokenQuery = 'INSERT INTO "tokens" (token, user_id) VALUES ($1, $2)';
+        await pool.query(storeTokenQuery, [token, userId]);
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
 };
 
-// Invalidar tokens previos
-export const invalidatePreviousTokens = async (username) => {
-    const query = 'UPDATE "tokens" SET invalidated = true WHERE username = $1';
-    await pool.query(query, [username]);
+export const invalidatePreviousTokens = async (userId) => {
+    try {
+        const invalidateTokensQuery = 'UPDATE "tokens" SET invalidated = true WHERE user_id = $1';
+        await pool.query(invalidateTokensQuery, [userId]);
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
 };
 
-// Invalidar un token específico (logout)
-export const invalidateToken = async (token) => {
-    const query = 'UPDATE "tokens" SET invalidated = true WHERE token = $1';
-    await pool.query(query, [token]);
-};
-
-// Verificar si el token es válido
 export const isTokenValid = async (token) => {
-    const query = 'SELECT invalidated FROM "tokens" WHERE token = $1';
-    const result = await pool.query(query, [token]);
-    return result.rows.length > 0 && !result.rows[0].invalidated;
+    try {
+        const checkTokenQuery = 'SELECT * FROM "tokens" WHERE token = $1 AND invalidated = false';
+        const { rows } = await pool.query(checkTokenQuery, [token]);
+        return rows.length > 0;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
 };

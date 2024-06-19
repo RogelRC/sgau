@@ -1,0 +1,33 @@
+// models/event.js
+module.exports = (sequelize, DataTypes) => {
+  const Event = sequelize.define('Event', {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true
+    },
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    description: DataTypes.TEXT,
+    date: {
+      type: DataTypes.DATEONLY,
+      allowNull: false
+    },
+    time: {
+      type: DataTypes.TIME,
+      allowNull: false
+    },
+    location: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    image: DataTypes.BLOB
+  }, {
+    timestamps: false, // Desactiva los timestamps automáticos de Sequelize
+    tableName: 'events' // Nombre real de la tabla en la base de datos
+  });
+
+  return Event;
+};

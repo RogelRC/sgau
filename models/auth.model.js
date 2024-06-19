@@ -13,6 +13,7 @@ const authenticateUser = async (username, password) => {
         if (!isPasswordValid) return null;
 
         return {
+            id: user.id,
             username: user.username,
             name: user.name,
             role: user.role,
