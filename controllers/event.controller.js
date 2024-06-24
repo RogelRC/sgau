@@ -1,76 +1,57 @@
-import { eventModel } from "../models/event.model.js";
+import Event from '../models/event.model.js';
 
-export const createEvent = async (req, res) => {
-    const { name, date, time, location, description } = req.body;
-    const image = req.file; // Assuming image is uploaded as a file
-
+export const createEvent = async (eventData, image) => {
     try {
-        const event = await eventModel.createEvent(name, date, time, location, description, image);
-        res.status(201).json(event);
+        console.log(image);
+        eventData.image = image;
+        console.log(eventData);
+        const event = await Event.create(eventData);
+        return event;
+
     } catch (error) {
-        console.error("Error creating event:", error);
-        res.status(500).json({ message: "Internal server error" });
+        throw new Error(`Error creating event: ${error.message}`);
     }
 };
 
-export const updateEvent = async (req, res) => {
-    const { id } = req.params;
-    const { name, date, time, location, description } = req.body;
-    const image = req.file; // Assuming image is uploaded as a file
-
+export const getAllEvents = async () => {
     try {
-        const event = await eventModel.updateEvent(id, name, date, time, location, description, image);
-        if (!event) {
-            return res.status(404).json({ message: "Event not found" });
-        }
-        res.json(event);
+        const events = await Event.findAll();
+        return events;
     } catch (error) {
-        console.error("Error updating event:", error);
-        res.status(500).json({ message: "Internal server error" });
+        throw new Error(`Error fetching events: ${error.message}`);
     }
 };
 
-export const deleteEvent = async (req, res) => {
-    const { id } = req.params;
-
+export const getEventById = async (eventId) => {
     try {
-        await eventModel.deleteEvent(id);
-        res.status(204).send();
+        const event = await event.findByPk(eventId);
+        if (!event) throw new Error('Event not found');
+        return event;
     } catch (error) {
-        console.error("Error deleting event:", error);
-        res.status(500).json({ message: "Internal server error" });
+        throw new Error(`Error fetching event: ${error.message}`);
     }
 };
 
-export const getEvents = async (req, res) => {
+export const updateEvent = async (eventId, updateData) => {
     try {
-        const events = await eventModel.getEvents();
-        res.json(events);
+        const event = await Event.findByPk(eventId);
+        if (!event) throw new Error('Event not found');
+        
+        await event.update(updateData);
+        return event;
     } catch (error) {
-        console.error("Error getting events:", error);
-        res.status(500).json({ message: "Internal server error" });
+        throw new Error(`Error updating event: ${error.message}`);
     }
 };
 
-export const getEventById = async (req, res) => {
-    const { id } = req.params;
-
+export const deleteEvent = async (eventId) => {
     try {
-        const event = await eventModel.getEventById(id);
-        if (!event) {
-            return res.status(404).json({ message: "Event not found" });
-        }
-        res.json(event);
+        const event = await Event.findByPk(eventId);
+        if (!event) throw new Error('Event not found');
+        
+        await event.destroy();
+        return true;
     } catch (error) {
-        console.error("Error getting event by ID:", error);
-        res.status(500).json({ message: "Internal server error" });
+        throw new Error(`Error deleting event: ${error.message}`);
     }
-};
-
-export const eventController = {
-    createEvent,
-    updateEvent,
-    deleteEvent,
-    getEvents,
-    getEventById,
 };

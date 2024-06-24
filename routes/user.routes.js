@@ -1,15 +1,53 @@
-// user.routes.js
-import express from "express";
-import { userController } from "../controllers/user.controller.js";
-import { protectedRoute } from "../middlewares/createProtectedRoute.js";
-import { isAdmin } from "../middlewares/isAdmin.js";
+import express from 'express';
+import { createUser, getAllUsers, getUserById, updateUser, deleteUser } from '../controllers/user.controller.js';
+import { protectedRoute } from '../middlewares/createProtectedRoute.js'
+import { isAdmin } from '../middlewares/isAdmin.js';
 
 const router = express.Router();
 
-router.post("/", protectedRoute, isAdmin, userController.createUser);
-router.get("/", protectedRoute, isAdmin, userController.getUsers);
-router.get("/:username", protectedRoute, isAdmin, userController.getUserByUsername);
-router.put("/:username", protectedRoute, isAdmin, userController.updateUser);
-router.delete("/:username", protectedRoute, isAdmin, userController.deleteUser);
+router.post('/user', protectedRoute, isAdmin,  async (req, res) => {
+    try {
+        const user = await createUser(req.body);
+        res.status(201).json(user);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
+router.get('/user', protectedRoute, isAdmin, async (req, res) => {
+    try {
+        const users = await getAllUsers();
+        res.status(200).json(users);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
+router.get('/user/:id', protectedRoute, isAdmin, async (req, res) => {
+    try {
+        const user = await getUserById(req.params.id);
+        res.status(200).json(user);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
+router.put('/user/:id', protectedRoute, isAdmin, async (req, res) => {
+    try {
+        const user = await updateUser(req.params.id, req.body);
+        res.status(200).json(user);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
+router.delete('/user/:id', protectedRoute, isAdmin, async (req, res) => {
+    try {
+        await deleteUser(req.params.id);
+        res.status(204).json();
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
 
 export default router;

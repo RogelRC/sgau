@@ -1,17 +1,55 @@
-import express from "express";
-import { eventController } from "../controllers/event.controller.js";
-import { protectedRoute } from "../middlewares/createProtectedRoute.js";
-import { isAdmin } from "../middlewares/isAdmin.js";
-import multer from "multer";
+import express from 'express';
+import { createEvent, getAllEvents, getEventById, updateEvent, deleteEvent } from '../controllers/event.controller.js';
+import { protectedRoute } from '../middlewares/createProtectedRoute.js'
+import { isAdmin } from '../middlewares/isAdmin.js';
+import upload from '../middlewares/multer.js';
 
 const router = express.Router();
-const upload = multer({ dest: "uploads/" });
 
-// Rutas para eventos
-router.post("/", protectedRoute, isAdmin, upload.single("image"), eventController.createEvent);
-router.put("/:id", protectedRoute, isAdmin, upload.single("image"), eventController.updateEvent);
-router.delete("/:id", protectedRoute, isAdmin, eventController.deleteEvent);
-router.get("/", eventController.getEvents);
-router.get("/:id", eventController.getEventById);
+router.post('/event', protectedRoute, isAdmin, upload.single('image'), async (req, res) => {
+    try {
+        console.log(req.file);
+        const event = await createEvent(req.body, req.file);
+        res.status(201).json(event);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
+router.get('/event', protectedRoute, isAdmin, async (req, res) => {
+    try {
+        const events = await getAllEvents();
+        res.status(200).json(events);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
+router.get('/event/:id', protectedRoute, isAdmin, async (req, res) => {
+    try {
+        const event = await getEventById(req.params.id);
+        res.status(200).json(event);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
+router.put('/event/:id', protectedRoute, isAdmin, async (req, res) => {
+    try {
+        const event = await updateEvent(req.params.id, req.body);
+        res.status(200).json(event);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
+router.delete('/event/:id', protectedRoute, isAdmin, async (req, res) => {
+    try {
+        await deleteEvent(req.params.id);
+        res.status(204).json();
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
 
 export default router;

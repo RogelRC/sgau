@@ -1,37 +1,76 @@
-import { authModel } from "../models/auth.model.js";
-import { generateToken, storeToken, invalidatePreviousTokens } from "../utils/authUtils.js";
-import { pool } from "../database/connection.js"; // Importar la conexión a la base de datos
+import bcrypt from "bcrypt"
+import { generateToken } from "../utils/authUtils.js"
+import Token from '../models/auth.model.js';
+import User from '../models/user.model.js';
 
-export const loginUser = async (req, res) => {
-    const { username, password } = req.body;
-
+export const createToken = async (tokenData) => {
     try {
-        const user = await authModel.authenticateUser(username, password);
-
-        if (!user) {
-            return res.status(401).json({ message: "Invalid username or password" });
-        }
-
-        await invalidatePreviousTokens(user.id); // Cambiado a user.id
-        const token = generateToken(user);
-        await storeToken(token, user.id); // Cambiado a user.id
-
-        res.json({ token, user });
+        const token = await Token.create(tokenData);
+        return token;
     } catch (error) {
-        console.error("Error logging in user:", error);
-        res.status(500).json({ message: "Internal server error" });
+        throw new Error(`Error creating token: ${error.message}`);
     }
 };
 
-export const logoutUser = async (req, res) => {
-    const token = req.headers.authorization.split(" ")[1];
-
+export const getAllTokens = async () => {
     try {
-        const invalidateTokenQuery = 'UPDATE "tokens" SET invalidated = true WHERE token = $1';
-        await pool.query(invalidateTokenQuery, [token]);
-        res.json({ message: "Successfully logged out" });
+        const tokens = await Token.findAll();
+        return tokens;
     } catch (error) {
-        console.error("Error logging out user:", error);
-        res.status(500).json({ message: "Internal server error" });
+        throw new Error(`Error fetching tokens: ${error.message}`);
+    }
+};
+
+export const getTokenByValue = async (tokenValue) => {
+    try {
+        const token = await Token.findOne({ where: { token: tokenValue } });
+        if (!token) throw new Error('Token not found');
+        return token;
+    } catch (error) {
+        throw new Error(`Error fetching token: ${error.message}`);
+    }
+};
+
+export const updateToken = async (tokenValue, updateData) => {
+    try {
+        const token = await Token.findOne({ where: { token: tokenValue } });
+        if (!token) throw new Error('Token not found');
+        
+        await token.update(updateData);
+        return token;
+    } catch (error) {
+        throw new Error(`Error updating token: ${error.message}`);
+    }
+};
+
+export const deleteToken = async (tokenValue) => {
+    try {
+        const token = await Token.findOne({ where: { token: tokenValue } });
+        if (!token) throw new Error('Token not found');
+        
+        await token.destroy();
+        return true;
+    } catch (error) {
+        throw new Error(`Error deleting token: ${error.message}`);
+    }
+};
+
+export const authenticateUser = async (username, password) => {
+    try {
+        const user = await User.findOne({ where: { username } });
+        if (!user) {
+            throw new Error('Invalid username or password');
+        }
+
+        const validPassword = await bcrypt.compare(password, user.password);
+        if (!validPassword) {
+            throw new Error('Invalid username or password');
+        }
+
+        // Token generation logic here (e.g., JWT)
+        const token = await createToken({ token: generateToken(user), user_id: user.id });
+        return token;
+    } catch (error) {
+        throw new Error(`Error authenticating user: ${error.message}`);
     }
 };

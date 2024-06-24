@@ -1,4 +1,4 @@
-export const isStrongPassword = (password) => {
+const isStrongPassword = (password) => {
   if (password.length < 8) return false;
 
   let cap = false, min = false, num = false, other = false;
@@ -12,3 +12,5 @@ export const isStrongPassword = (password) => {
 
   return cap && min && other && num;
 };
+
+export default isStrongPassword;

@@ -3,7 +3,7 @@ import { pool } from './connection.js';
 const createTables = async () => {
     const userTableQuery = `
         CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY,
+            id SERIAL PRIMARY KEY,
             username VARCHAR(50) UNIQUE NOT NULL,
             password VARCHAR(255) NOT NULL,
             name VARCHAR(50) NOT NULL,

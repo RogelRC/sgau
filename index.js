@@ -1,9 +1,11 @@
 import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
+import "dotenv/config";
 
-import authRoutes from "./routes/auth.routes.js";
+// Importar las rutas correctamente
 import userRoutes from "./routes/user.routes.js";
+import authRoutes from "./routes/auth.routes.js";
 import eventRoutes from "./routes/event.routes.js";
 
 const app = express();
@@ -14,9 +16,10 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use("/auth", authRoutes);
-app.use("/user", userRoutes);
-app.use("/event", eventRoutes);
+// Utilizar las rutas correctamente
+app.use(userRoutes);
+app.use(authRoutes);
+app.use(eventRoutes);
 
 app.use('/uploads', express.static('uploads'));
 
