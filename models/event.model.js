@@ -27,9 +27,9 @@ const Event = sequelize.define('Event', {
     type: DataTypes.STRING(255),
     allowNull: false
   },
-  image: {
-    type: DataTypes.BLOB,
-    allowNull: true
+  image_path: {
+    type: DataTypes.STRING(255),
+    allowNull: false
   }
 }, {
   tableName: 'events',

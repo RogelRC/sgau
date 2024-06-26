@@ -8,8 +8,8 @@ const router = express.Router();
 
 router.post('/event', protectedRoute, isAdmin, upload.single('image'), async (req, res) => {
     try {
-        console.log(req.file);
-        const event = await createEvent(req.body, req.file);
+        const imagePath = req.file ? req.file.path : null;
+        const event = await createEvent(req.body, imagePath);
         res.status(201).json(event);
     } catch (error) {
         res.status(400).json({ message: error.message });

@@ -22,28 +22,10 @@ const createTables = async () => {
         END;
         $$ LANGUAGE plpgsql;
 
-        CREATE TRIGGER set_modification_date
+        CREATE OR REPLACE TRIGGER set_modification_date
         BEFORE UPDATE ON users
         FOR EACH ROW
         EXECUTE FUNCTION update_modification_date();
-
-        CREATE OR REPLACE FUNCTION get_first_missing_id()
-        RETURNS INTEGER AS $$
-        DECLARE
-            result INTEGER;
-        BEGIN
-            SELECT MIN(t1.id + 1) INTO result
-            FROM users t1
-            LEFT JOIN users t2 ON t1.id + 1 = t2.id
-            WHERE t2.id IS NULL;
-
-            IF result IS NULL THEN
-                RETURN 1;
-            ELSE
-                RETURN result;
-            END IF;
-        END;
-        $$ LANGUAGE plpgsql;
     `;
 
     const tokenTableQuery = `
@@ -63,7 +45,34 @@ const createTables = async () => {
             date DATE NOT NULL,
             time TIME NOT NULL,
             location VARCHAR(255) NOT NULL,
-            image BYTEA
+            image_path VARCHAR(255) NOT NULL
+        );
+    `;
+
+    const subjectsTableQuery = `
+        CREATE TABLE IF NOT EXISTS subjects (
+            id SERIAL PRIMARY KEY,
+            name VARCHAR(100) NOT NULL
+        );
+    `;
+
+    const scheduleTableQuery = `
+        CREATE TABLE IF NOT EXISTS schedule (
+            id SERIAL PRIMARY KEY,
+            day VARCHAR(20) NOT NULL CHECK (day IN ('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday')),
+            turn INTEGER NOT NULL CHECK (turn >= 1 AND turn <= 6),
+            hour TIME NOT NULL,
+            user_id INTEGER NOT NULL REFERENCES users(id),
+            subject_id INTEGER NOT NULL REFERENCES subjects(id)
+        );
+    `;
+
+    const attachmentsTableQuery = `
+        CREATE TABLE IF NOT EXISTS attachments (
+            id SERIAL PRIMARY KEY,
+            schedule_id INTEGER NOT NULL REFERENCES schedule(id) ON DELETE CASCADE,
+            file_path VARCHAR(255) NOT NULL,
+            upload_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
     `;
 
@@ -71,6 +80,9 @@ const createTables = async () => {
         await pool.query(userTableQuery);
         await pool.query(tokenTableQuery);
         await pool.query(eventTableQuery);
+        await pool.query(subjectsTableQuery);
+        await pool.query(scheduleTableQuery);
+        await pool.query(attachmentsTableQuery);
         console.log("Tables created successfully");
     } catch (error) {
         console.error("Error creating tables:", error);

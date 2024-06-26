@@ -1,13 +1,10 @@
 import Event from '../models/event.model.js';
 
-export const createEvent = async (eventData, image) => {
+export const createEvent = async (eventData, imagePath) => {
     try {
-        console.log(image);
-        eventData.image = image;
-        console.log(eventData);
+        eventData.image_path = imagePath;
         const event = await Event.create(eventData);
         return event;
-
     } catch (error) {
         throw new Error(`Error creating event: ${error.message}`);
     }

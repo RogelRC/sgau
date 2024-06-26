@@ -1,5 +1,5 @@
-// multerConfig.js
 import multer from 'multer';
+import path from 'path';
 
 // Configuración de multer para guardar archivos en la carpeta 'uploads'
 const storage = multer.diskStorage({
@@ -7,8 +7,11 @@ const storage = multer.diskStorage({
         cb(null, 'uploads/');
     },
     filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, file.fieldname + '-' + uniqueSuffix + '-' + file.originalname);
+        const timestamp = new Date().toISOString().replace(/[-:.]/g, '');
+        const username = req.user.username; // Asegúrate de tener el nombre de usuario en req.user
+        const fileExtension = path.extname(file.originalname);
+        const filename = `${timestamp}-${username}${fileExtension}`;
+        cb(null, filename);
     }
 });
 
