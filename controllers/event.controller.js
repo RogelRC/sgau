@@ -29,11 +29,12 @@ export const getEventById = async (eventId) => {
     }
 };
 
-export const updateEvent = async (eventId, updateData) => {
+export const updateEvent = async (eventId, updateData, imagePath) => {
     try {
         const event = await Event.findByPk(eventId);
         if (!event) throw new Error('Event not found');
         
+        updateData.image_path = imagePath;
         await event.update(updateData);
         return event;
     } catch (error) {

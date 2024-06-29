@@ -1,7 +1,7 @@
 import express from 'express';
 import { createSubject, getAllSubjects, getSubjectById, updateSubject, deleteSubject } from '../controllers/subject.controller.js';
 import { protectedRoute } from '../middlewares/createProtectedRoute.js';
-import { isAdmin } from '../middlewares/isAdmin.js';
+import { isAdmin } from '../middlewares/isRole.js';
 
 const router = express.Router();
 

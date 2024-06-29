@@ -45,7 +45,7 @@ const createTables = async () => {
             date DATE NOT NULL,
             time TIME NOT NULL,
             location VARCHAR(255) NOT NULL,
-            image_path VARCHAR(255) NOT NULL
+            image_path VARCHAR(255)
         );
     `;
 
@@ -61,7 +61,6 @@ const createTables = async () => {
             id SERIAL PRIMARY KEY,
             day VARCHAR(20) NOT NULL CHECK (day IN ('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday')),
             turn INTEGER NOT NULL CHECK (turn >= 1 AND turn <= 6),
-            hour TIME NOT NULL,
             user_id INTEGER NOT NULL REFERENCES users(id),
             subject_id INTEGER NOT NULL REFERENCES subjects(id)
         );

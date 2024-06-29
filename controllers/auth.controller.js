@@ -59,7 +59,7 @@ export const authenticateUser = async (username, password) => {
     try {
         const user = await User.findOne({ where: { username } });
         if (!user) {
-            throw new Error('Invalid username or password');
+            throw new Error('User not found');
         }
 
         const validPassword = await bcrypt.compare(password, user.password);
@@ -68,7 +68,10 @@ export const authenticateUser = async (username, password) => {
         }
 
         // Token generation logic here (e.g., JWT)
-        const token = await createToken({ token: generateToken(user), user_id: user.id });
+        const token = await createToken({ token: generateToken(user), user_id: user.id});
+        token.dataValues.name = user.name;
+        token.dataValues.role = user.role;
+
         return token;
     } catch (error) {
         throw new Error(`Error authenticating user: ${error.message}`);

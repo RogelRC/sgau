@@ -21,10 +21,6 @@ const Schedule = sequelize.define('Schedule', {
       max: 6
     }
   },
-  hour: {
-    type: DataTypes.TIME,
-    allowNull: false
-  },
   user_id: {
     type: DataTypes.INTEGER,
     references: {

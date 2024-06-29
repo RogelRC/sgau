@@ -29,7 +29,6 @@ const Event = sequelize.define('Event', {
   },
   image_path: {
     type: DataTypes.STRING(255),
-    allowNull: false
   }
 }, {
   tableName: 'events',

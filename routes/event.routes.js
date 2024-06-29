@@ -1,7 +1,7 @@
 import express from 'express';
 import { createEvent, getAllEvents, getEventById, updateEvent, deleteEvent } from '../controllers/event.controller.js';
 import { protectedRoute } from '../middlewares/createProtectedRoute.js'
-import { isAdmin } from '../middlewares/isAdmin.js';
+import { isAdmin } from '../middlewares/isRole.js';
 import upload from '../middlewares/multer.js';
 
 const router = express.Router();
@@ -16,7 +16,7 @@ router.post('/event', protectedRoute, isAdmin, upload.single('image'), async (re
     }
 });
 
-router.get('/event', protectedRoute, isAdmin, async (req, res) => {
+router.get('/event', async (req, res) => {
     try {
         const events = await getAllEvents();
         res.status(200).json(events);
@@ -25,7 +25,7 @@ router.get('/event', protectedRoute, isAdmin, async (req, res) => {
     }
 });
 
-router.get('/event/:id', protectedRoute, isAdmin, async (req, res) => {
+router.get('/event/:id', async (req, res) => {
     try {
         const event = await getEventById(req.params.id);
         res.status(200).json(event);
@@ -34,9 +34,10 @@ router.get('/event/:id', protectedRoute, isAdmin, async (req, res) => {
     }
 });
 
-router.put('/event/:id', protectedRoute, isAdmin, async (req, res) => {
+router.put('/event/:id', protectedRoute, isAdmin, upload.single('image'), async (req, res) => {
     try {
-        const event = await updateEvent(req.params.id, req.body);
+        const imagePath = req.file ? req.file.path : null;
+        const event = await updateEvent(req.params.id, req.body, imagePath);
         res.status(200).json(event);
     } catch (error) {
         res.status(400).json({ message: error.message });
