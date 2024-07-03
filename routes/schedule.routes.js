@@ -14,7 +14,7 @@ router.post('/schedule', protectedRoute, isAdmin, async (req, res) => {
     }
 });
 
-router.get('/schedule', protectedRoute, async (req, res) => {
+router.get('/schedule', protectedRoute, isAdmin, async (req, res) => {
     try {
         const schedules = await getAllSchedules();
         res.status(200).json(schedules);
@@ -23,7 +23,7 @@ router.get('/schedule', protectedRoute, async (req, res) => {
     }
 });
 
-router.get('/schedule/:id', protectedRoute, async (req, res) => {
+router.get('/schedule/:id', protectedRoute, isAdmin, async (req, res) => {
     try {
         const schedule = await getScheduleById(req.params.id);
         res.status(200).json(schedule);

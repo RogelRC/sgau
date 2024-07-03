@@ -64,3 +64,16 @@ export const deleteUser = async (userId) => {
         throw new Error(`Error deleting user: ${error.message}`);
     }
 };
+
+export const getTeachers = async () => {
+    try {
+        const users = await User.findAll({
+            where: {
+                role: 'Teacher'
+            }
+        });
+        return users;
+    } catch (error) {
+        throw new Error(`Error fetching users: ${error.message}`);
+    }
+};

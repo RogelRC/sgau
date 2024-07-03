@@ -1,6 +1,6 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../database/sequelize.js';
-import Schedule from './schedule.model.js';
+import Turn from './turn.model.js';
 
 const Attachment = sequelize.define('Attachment', {
   id: {
@@ -8,13 +8,14 @@ const Attachment = sequelize.define('Attachment', {
     autoIncrement: true,
     primaryKey: true
   },
-  schedule_id: {
+  turn_id: {
     type: DataTypes.INTEGER,
+    allowNull: false,
     references: {
-      model: Schedule,
+      model: Turn,
       key: 'id'
     },
-    allowNull: false
+    onDelete: 'CASCADE'
   },
   file_path: {
     type: DataTypes.STRING(255),

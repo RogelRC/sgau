@@ -1,5 +1,5 @@
 import express from 'express';
-import { createUser, getAllUsers, getUserById, updateUser, deleteUser } from '../controllers/user.controller.js';
+import { createUser, getAllUsers, getUserById, updateUser, deleteUser, getTeachers } from '../controllers/user.controller.js';
 import { protectedRoute } from '../middlewares/createProtectedRoute.js'
 import { isAdmin } from '../middlewares/isRole.js';
 
@@ -45,6 +45,15 @@ router.delete('/user/:id', protectedRoute, isAdmin, async (req, res) => {
     try {
         await deleteUser(req.params.id);
         res.status(204).json();
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
+router.get('/teachers', protectedRoute, isAdmin, async (req, res) => {
+    try {
+        const users = await getTeachers();
+        res.status(200).json(users);
     } catch (error) {
         res.status(400).json({ message: error.message });
     }

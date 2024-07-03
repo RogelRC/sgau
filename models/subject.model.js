@@ -10,6 +10,9 @@ const Subject = sequelize.define('Subject', {
   name: {
     type: DataTypes.STRING(100),
     allowNull: false
+  },
+  abbreviation: {
+    type: DataTypes.STRING(100)
   }
 }, {
   tableName: 'subjects',

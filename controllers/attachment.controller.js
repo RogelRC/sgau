@@ -32,7 +32,7 @@ export const updateAttachment = async (attachmentId, updateData) => {
     try {
         const attachment = await Attachment.findByPk(attachmentId);
         if (!attachment) throw new Error('Attachment not found');
-
+        
         await attachment.update(updateData);
         return attachment;
     } catch (error) {
@@ -44,7 +44,7 @@ export const deleteAttachment = async (attachmentId) => {
     try {
         const attachment = await Attachment.findByPk(attachmentId);
         if (!attachment) throw new Error('Attachment not found');
-
+        
         await attachment.destroy();
         return true;
     } catch (error) {

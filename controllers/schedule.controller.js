@@ -1,4 +1,5 @@
 import Schedule from '../models/schedule.model.js';
+import Turn from '../models/turn.model.js';
 
 export const createSchedule = async (scheduleData) => {
     try {
@@ -20,7 +21,12 @@ export const getAllSchedules = async () => {
 
 export const getScheduleById = async (scheduleId) => {
     try {
-        const schedule = await Schedule.findByPk(scheduleId);
+        const schedule = await Schedule.findByPk(scheduleId,{
+            include: {
+                model: Turn,
+                as: 'turns'
+            }
+        });
         if (!schedule) throw new Error('Schedule not found');
         return schedule;
     } catch (error) {
@@ -32,7 +38,7 @@ export const updateSchedule = async (scheduleId, updateData) => {
     try {
         const schedule = await Schedule.findByPk(scheduleId);
         if (!schedule) throw new Error('Schedule not found');
-
+        
         await schedule.update(updateData);
         return schedule;
     } catch (error) {
@@ -44,7 +50,7 @@ export const deleteSchedule = async (scheduleId) => {
     try {
         const schedule = await Schedule.findByPk(scheduleId);
         if (!schedule) throw new Error('Schedule not found');
-
+        
         await schedule.destroy();
         return true;
     } catch (error) {

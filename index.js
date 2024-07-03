@@ -12,6 +12,8 @@ import eventRoutes from "./routes/event.routes.js";
 import attachmentRoutes from "./routes/attachment.routes.js";
 import scheduleRoutes from "./routes/schedule.routes.js";
 import subjectRoutes from "./routes/subject.routes.js";
+import classroomRoutes from "./routes/classroom.routes.js";
+import turnRoutes from "./routes/turn.routes.js";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -33,6 +35,8 @@ app.use(eventRoutes);
 app.use(attachmentRoutes);
 app.use(scheduleRoutes);
 app.use(subjectRoutes);
+app.use(classroomRoutes);
+app.use(turnRoutes);
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
